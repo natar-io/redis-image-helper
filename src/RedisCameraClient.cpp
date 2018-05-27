@@ -1,8 +1,5 @@
 #include "RedisCameraClient.hpp"
 
-//TOREMOVE:
-#include <iostream>
-
 bool RedisCameraClient::connect()
 {
     struct timeval timeout = {1, 500000};
@@ -30,7 +27,7 @@ CameraFrame* RedisCameraClient::getCameraFrame()
     return new CameraFrame(width, height, 3, pixels);
 }
 
-void RedisCameraClient::setCameraFrame(CameraFrame *frame)
+void RedisCameraClient::setCameraFrame(CameraFrame *frame, bool isOutput)
 {
     unsigned int width = frame->width();
     unsigned int height = frame->height();
@@ -42,7 +39,13 @@ void RedisCameraClient::setCameraFrame(CameraFrame *frame)
     m_reply = (redisReply*)redisCommand(m_context, "SET %b %b", m_cameraKey.c_str(), (size_t)m_cameraKey.length(), data, size);
     // TODO: Redo that ?
     // Maybe we should not SET the image but we should publish it ?
-    m_reply = (redisReply*)redisCommand(m_context, "PUBLISH cfr ready");
+    if (!isOutput)
+    {
+        m_reply = (redisReply*)redisCommand(m_context, "PUBLISH cfr ready");
+    }
+    else {
+        m_reply = (redisReply*)redisCommand(m_context, "PUBLISH cft treated");
+    }
 }
 
 int RedisCameraClient::getInt(std::string intKey)

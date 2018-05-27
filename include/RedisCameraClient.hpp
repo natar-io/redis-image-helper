@@ -28,7 +28,7 @@ public:
 
     bool connect();
     CameraFrame* getCameraFrame();
-    void setCameraFrame(CameraFrame* frame);
+    void setCameraFrame(CameraFrame* frame, bool isOutput = false);
 
     void setCameraKey(std::string cameraKey) { m_cameraKey = cameraKey; };
 };
