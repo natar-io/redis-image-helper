@@ -7,12 +7,17 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_LIST_DIR}/cmake/modu
 
 find_package(OpenCV REQUIRED core opencv_imgcodecs opencv_highgui opencv_imgproc opencv_videoio)
 if (NOT OPENCV_FOUND)
-        message(FATAL_ERROR, "OpenCV not found.")
+        message(FATAL_ERROR "OpenCV not found.")
 endif()
 
 find_package(hiredis REQUIRED)
 if (NOT HIREDIS_FOUND)
-    message(FATAL_ERROR, "hiredis not found.")
+    message(FATAL_ERROR "hiredis not found.")
+endif()
+
+find_package(curlpp REQUIRED)
+if (NOT CURLPP_FOUND)
+    message(FATAL_ERROR "curlpp not found.")
 endif()
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR}/include )
