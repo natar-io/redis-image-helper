@@ -1,7 +1,7 @@
-#ifndef _CAMERAFRAME_HPP_
-#define _CAMERAFRAME_HPP_
+#ifndef _IMAGE_HPP_
+#define _IMAGE_HPP_
 
-class CameraFrame
+class Image
 {
 private:
     unsigned int m_width;
@@ -10,7 +10,7 @@ private:
     unsigned char* m_data;
 
 public:
-    CameraFrame(unsigned int width, unsigned int height, unsigned int channels, unsigned char* data) : m_width(width), m_height(height), m_channels(channels)
+    Image(unsigned int width, unsigned int height, unsigned int channels, unsigned char* data) : m_width(width), m_height(height), m_channels(channels)
     {
         m_data = data;
     };
@@ -21,5 +21,5 @@ public:
     unsigned char* data() { return m_data; };
 };
 
-#endif // CAMERAFRAME
+#endif // IMAGE
 

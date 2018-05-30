@@ -2,12 +2,12 @@
 
 RedisCameraServer::RedisCameraServer()
 {
-    m_cameraClient = new RedisCameraClient();
+    m_imageClient = new RedisImageHelper();
 }
 
 bool RedisCameraServer::start(std::string gstreamerCommand)
 {
-    if (!m_cameraClient->connect())
+    if (!m_imageClient->connect())
     {
         std::cout << "Could not connect" << std::endl;
         return false;
@@ -41,6 +41,6 @@ void RedisCameraServer::pickUpCameraFrame()
     *m_camera >> frame;
     cv::cvtColor(frame, RGBFrame, CV_BGR2RGB);
 
-    CameraFrame* cFrame = new CameraFrame(RGBFrame.cols, RGBFrame.rows, RGBFrame.channels(), RGBFrame.data);
-    m_cameraClient->setCameraFrame(cFrame);
+    Image* image = new Image(RGBFrame.cols, RGBFrame.rows, RGBFrame.channels(), RGBFrame.data);
+    m_imageClient->setImage(image);
 }

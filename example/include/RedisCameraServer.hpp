@@ -2,19 +2,19 @@
 #define REDISCAMERASERVER_H
 
 #include <opencv2/opencv.hpp>
-#include <RedisCameraClient.hpp>
+#include <RedisImageHelper.hpp>
 
 class RedisCameraServer
 {
 private:
-    RedisCameraClient* m_cameraClient;
+    RedisImageHelper* m_imageClient;
     cv::VideoCapture* m_camera;
 public:
     RedisCameraServer();
     bool start(std::string command);
     bool start();
     void pickUpCameraFrame();
-    void setCameraKey(std::string cameraKey) { m_cameraClient->setCameraKey(cameraKey); };
+    void setCameraKey(std::string cameraKey) { m_imageClient->setCameraKey(cameraKey); };
 };
 
 #endif // REDISCAMERASERVER_H

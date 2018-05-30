@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.2)
-project(rediscamclient)
+project(redisimagehelper-example)
 
 set (CMAKE_CXX_STANDARD 11)
 
@@ -15,15 +15,15 @@ if (NOT HIREDIS_FOUND)
     message(FATAL_ERROR, "hiredis not found.")
 endif()
 
-find_package(rediscamclient REQUIRED)
-if (NOT REDISCAMCLIENT_FOUND)
-	message(FATAL_ERROR, "rediscamclient not found")
+find_package(redisimagehelper REQUIRED)
+if (NOT REDISIMAGEHELPER_FOUND)
+	message(FATAL_ERROR, "redisimagehelper not found")
 endif()
 
 include_directories (${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories($(/usr/local/include/gstreamer-1.0) /gst)
-message(${REDISCAMCLIENT_INCLUDE_DIR})
-include_directories(${REDISCAMCLIENT_INCLUDE_DIR})
+include_directories(${REDISIMAGEHELPER_INCLUDE_DIR})
+message("${REDISIMAGEHELPER_INCLUDE_DIR}")
 
 set(GLOB HEADERS include/*.hpp)	
 
@@ -32,10 +32,12 @@ set(CLI_SOURCES
 
 set(SERV_SOURCES
         src/RedisCameraServer.cpp
-        src/server.cpp)
+        src/server.cpp
+
+        include/RedisCameraServer.hpp)
 
 add_executable (rcamcli ${CLI_SOURCES} ${HEADERS})
-target_link_libraries (rcamcli rediscamclient ${HIREDIS_LIBS} ${OpenCV_LIBS})
+target_link_libraries (rcamcli ${REDISIMAGEHELPER_LIBS} ${HIREDIS_LIBS} ${OpenCV_LIBS})
 
 add_executable (rcamserv ${SERV_SOURCES} ${HEADERS})
-target_link_libraries(rcamserv rediscamclient ${HIREDIS_LIBS} ${OpenCV_LIBS})
+target_link_libraries(rcamserv ${REDISIMAGEHELPER_LIBS} ${HIREDIS_LIBS} ${OpenCV_LIBS})
