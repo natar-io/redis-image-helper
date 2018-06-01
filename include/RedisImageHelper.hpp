@@ -15,11 +15,6 @@ private:
     std::string m_cameraKey;
     int m_port;
 
-    int getInt(std::string intKey);
-    char* getString(std::string stringKey, size_t& dataLength);
-    void setInt(std::string intKey, int value);
-    void setString(std::string stringKey, char* value);
-
 public:
     RedisImageHelper() : m_hostname("127.0.0.1"), m_port(6379), m_cameraKey("nectar:jiii-mi:camera-server:camera#0") {};
     RedisImageHelper(std::string hostname, int port, std::string cameraKey) : m_hostname(hostname), m_port(port), m_cameraKey(cameraKey) {};
@@ -29,7 +24,11 @@ public:
     bool connect();
 
     Image* getImage();
-    void setImage(Image* image, bool isOutput = false);
+    void setImage(Image* image, bool isOutput = false);    
+    int getInt(std::string intKey);
+    char* getString(std::string stringKey, size_t& dataLength);
+    void setInt(std::string intKey, int value);
+    void setString(std::string stringKey, char* value);
 
     void publishImage(Image* image, std::string publishKey);
 

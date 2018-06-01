@@ -15,6 +15,8 @@ public:
         m_data = data;
     };
 
+    ~Image() { delete m_data; }
+
     const unsigned int width() { return m_width; };
     const unsigned int height() { return m_height; };
     const unsigned int channels() { return m_channels; };
