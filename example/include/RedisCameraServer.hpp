@@ -11,6 +11,7 @@ private:
     cv::VideoCapture* m_camera;
 public:
     RedisCameraServer();
+    //~RedisCameraServer() { delete m_imageClient; delete m_camera; }
     bool start(std::string command);
     bool start();
     void pickUpCameraFrame();

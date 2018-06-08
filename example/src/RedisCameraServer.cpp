@@ -43,4 +43,5 @@ void RedisCameraServer::pickUpCameraFrame()
 
     Image* image = new Image(RGBFrame.cols, RGBFrame.rows, RGBFrame.channels(), RGBFrame.data);
     m_imageClient->setImage(image);
+    delete image;
 }
