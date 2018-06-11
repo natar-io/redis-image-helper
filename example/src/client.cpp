@@ -9,7 +9,7 @@ int main(int argc, char** argv)
     RedisImageHelper client;
     //RedisCameraClient client;
     if (!client.connect()) { std::cerr << "Client could not connect to redis server" << std::endl; }
-    client.setCameraKey("custom:image");
+    client.setMainKey("custom:image");
 
     cv::Mat frame, displayFrame;
     while (true)

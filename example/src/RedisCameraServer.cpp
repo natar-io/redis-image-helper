@@ -30,11 +30,6 @@ bool RedisCameraServer::start(std::string gstreamerCommand)
     return true;
 }
 
-bool RedisCameraServer::start()
-{
-    return this->start("");
-}
-
 void RedisCameraServer::pickUpCameraFrame()
 {
     cv::Mat frame, RGBFrame;

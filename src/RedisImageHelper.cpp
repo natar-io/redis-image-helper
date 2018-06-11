@@ -1,4 +1,5 @@
 #include "RedisImageHelper.hpp"
+#include <iostream>
 
 bool RedisImageHelper::connect()
 {
@@ -12,50 +13,20 @@ bool RedisImageHelper::connect()
     return true;
 }
 
-Image* RedisImageHelper::getImage()
+Image* RedisImageHelper::getImage(std::string imageKey)
 {
-    int width = getInt(m_cameraKey + ":width");
+    int width = getInt(imageKey + ":width");
     if (width == -1) return NULL;
-    int height = getInt(m_cameraKey + ":height");
+    int height = getInt(imageKey + ":height");
     if (height == -1) return NULL;
+    int channels = getInt(imageKey + ":channels");
+    if (channels == -1) return NULL;
 
     size_t dataLength;
-    char* data = getString(m_cameraKey, dataLength);
-    //WARN: We consider that the redis image is stored in RGB8 format
-    if (data == NULL || dataLength != width * height * 3) return NULL;
+    char* data = getString(imageKey, dataLength);
+    if (data == NULL || dataLength != width * height * channels) return NULL;
     unsigned char* pixels = reinterpret_cast<unsigned char*>(data);
-    return new Image(width, height, 3, pixels);
-}
-
-void RedisImageHelper::setImage(Image* image, bool isOutput)
-{
-    unsigned int width = image->width();
-    unsigned int height = image->height();
-    unsigned int channels = image->channels();
-    int size = width * height * channels;
-    char* data = reinterpret_cast<char*>(image->data());
-    setInt(m_cameraKey + ":width", width);
-    setInt(m_cameraKey + ":height", height);
-    m_reply = (redisReply*)redisCommand(m_context, "SET %b %b", m_cameraKey.c_str(), (size_t)m_cameraKey.length(), data, size);
-    // TODO: Redo that ?
-    // Maybe we should not SET the image but we should publish it ?
-    if (!isOutput)
-    {
-        m_reply = (redisReply*)redisCommand(m_context, "PUBLISH cfr ready");
-    }
-    else {
-        m_reply = (redisReply*)redisCommand(m_context, "PUBLISH cft treated");
-    }
-}
-
-void RedisImageHelper::publishImage(Image* image, std::string publishKey)
-{
-    unsigned int width = image->width();
-    unsigned int height = image->height();
-    unsigned int channels = image->channels();
-    int size = width * height * channels;
-    char* data = reinterpret_cast<char*>(image->data());
-    m_reply = (redisReply*)redisCommand(m_context, "PUBLISH %s %s", publishKey.c_str(), data);
+    return new Image(width, height, channels, pixels);
 }
 
 int RedisImageHelper::getInt(std::string intKey)
@@ -69,12 +40,6 @@ int RedisImageHelper::getInt(std::string intKey)
     return value;
 }
 
-void RedisImageHelper::setInt(std::string intKey, int value)
-{
-    std::string command = "SET " + intKey + " " + std::to_string(value);
-    m_reply = (redisReply*)redisCommand(m_context, command.c_str());
-}
-
 char* RedisImageHelper::getString(std::string stringKey, size_t& dataLength)
 {
     m_reply = (redisReply*)redisCommand(m_context, "GET %s", stringKey.c_str());
@@ -86,9 +51,50 @@ char* RedisImageHelper::getString(std::string stringKey, size_t& dataLength)
     return m_reply->str;
 }
 
-void RedisImageHelper::setString(std::string stringKey, char* value)
+void RedisImageHelper::setImage(Image* image, std::string imageKey)
+{
+    unsigned int width = image->width();
+    unsigned int height = image->height();
+    unsigned int channels = image->channels();
+    int size = width * height * channels;
+    char* data = reinterpret_cast<char*>(image->data());
+    setInt(width, imageKey + ":width");
+    setInt(height, imageKey + ":height");
+    setInt(channels, imageKey + ":channels");
+    m_reply = (redisReply*)redisCommand(m_context, "SET %b %b", imageKey.c_str(), (size_t)imageKey.length(), data, size);
+}
+
+void RedisImageHelper::setInt(int value, std::string intKey)
+{
+    std::string command = "SET " + intKey + " " + std::to_string(value);
+    m_reply = (redisReply*)redisCommand(m_context, command.c_str());
+}
+
+void RedisImageHelper::setString(char* value, std::string stringKey)
 {
     m_reply = (redisReply*)redisCommand(m_context, "SET %s %s", stringKey.c_str(), value);
 }
 
+void RedisImageHelper::publishImage(Image* image, std::string publishKey)
+{
+    unsigned int width = image->width();
+    unsigned int height = image->height();
+    unsigned int channels = image->channels();
+    int size = width * height * channels;
+    char* data = reinterpret_cast<char*>(image->data());
+    publishString(data, publishKey);
+    publishInt(width, publishKey + ":width");
+    publishInt(height, publishKey + "height");
+    publishInt(channels, publishKey + ":channels");
+}
+
+void RedisImageHelper::publishInt(int value, std::string publishKey)
+{
+    m_reply = (redisReply*)redisCommand(m_context, "PUBLISH %s %d", publishKey.c_str(), value);
+}
+
+void RedisImageHelper::publishString(char* value, std::string publishKey)
+{
+    m_reply = (redisReply*)redisCommand(m_context, "PUBLISH %s %s", publishKey.c_str(), value);
+}
 

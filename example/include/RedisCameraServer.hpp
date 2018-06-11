@@ -13,9 +13,9 @@ public:
     RedisCameraServer();
     //~RedisCameraServer() { delete m_imageClient; delete m_camera; }
     bool start(std::string command);
-    bool start();
+    bool start() { return start(""); }
     void pickUpCameraFrame();
-    void setCameraKey(std::string cameraKey) { m_imageClient->setCameraKey(cameraKey); };
+    void setMainKey(std::string mainKey) { m_imageClient->setMainKey(mainKey); };
 };
 
 #endif // REDISCAMERASERVER_H

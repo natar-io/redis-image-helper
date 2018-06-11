@@ -74,7 +74,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
     // This specify where we should find image data in redis
-    helper.setCameraKey("custom:image");
+    helper.setMainKey("custom:image");
 
     // Get image informations at specified key
     Image* image = helper.getImage();
@@ -91,6 +91,8 @@ int main(int argc, char** argv)
     /* CODE */
 }
 ```
+**Note:** If you do not want to specify a global key to get and set image to, you can pass the key as a parameter like so `RedisImageHelper.get***(type value, std::string key)`.
+
 
 Set image data into a redis server:
 
@@ -107,7 +109,7 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
     // This specify where we should set the image data in redis
-    helper.setCameraKey("custom:image");
+    helper.setMainKey("custom:image");
 
     uint width = ..., height = ..., channels = ...;
     unsigned char* data = ...; 
@@ -120,11 +122,12 @@ int main(int argc, char** argv)
     /* CODE */
 }
 ```
+**Note:** If you do not want to specify a global key to get and set image to, you can pass the key as a parameter like so `RedisImageHelper.set***(type value, std::string key)`.
 
 You can also use simple method to get/set int and strings from/to a redis server:
 ```cpp
-void RedisImageHelper::setInt(std::string key, int value);
-void RedisImageHelper::setString(std:string key, std::string value);
+void RedisImageHelper::setInt(int value, std::string key);
+void RedisImageHelper::setString(std::string value, std:string key);
 int RedisImageHelper::getInt(std::string key);
 char* RedisImageHelper::getString(std::string key, size_t& length);
 ```
