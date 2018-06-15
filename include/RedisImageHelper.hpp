@@ -2,27 +2,41 @@
 #define _REDIS_IMAGE_HELPER_HPP_
 
 #include <hiredis/hiredis.h>
+#include <hiredis/async.h>
+#include <hiredis/adapters/libevent.h>
 #include <string>
 
 #include "Image.hpp"
 
-class RedisImageHelper
-{
+class RedisImageHelper {
+protected:
+    int m_port;
+    std::string m_host;
+    std::string m_mainKey;
+
+public:
+    RedisImageHelper() : m_host("127.0.0.1"), m_port(6379), m_mainKey("") {}
+    RedisImageHelper(std::string host, int port, std::string mainKey = "") : m_host(host), m_port(port), m_mainKey(mainKey){}
+    void setMainKey(std::string mainKey) { m_mainKey = mainKey; }
+
+    virtual bool connect() = 0;
+    //virtual void disconnect() = 0;
+    virtual ~RedisImageHelper() {}
+};
+
+class RedisImageHelperSync : RedisImageHelper {
 private:
     redisContext* m_context;
     redisReply* m_reply;
-    std::string m_hostname;
-    std::string m_mainKey;
-    int m_port;
 
 public:
-    RedisImageHelper() : m_hostname("127.0.0.1"), m_port(6379), m_mainKey("nectar:jiii-mi:camera-server:camera#0") {};
-    RedisImageHelper(std::string hostname, int port, std::string cameraKey) : m_hostname(hostname), m_port(port), m_mainKey(cameraKey) {};
+    RedisImageHelperSync() : RedisImageHelper() {}
+    RedisImageHelperSync(std::string host, int port, std::string mainKey) : RedisImageHelper(host, port, mainKey) {}
 
-    ~RedisImageHelper() { redisFree(m_context); };
+    bool connect() override = 0;
+    ~RedisImageHelperSync() { redisFree(m_context); }
 
-    bool connect();
-
+    /*
     Image*  getImage(std::string imageKey);
     Image*  getImage() { return getImage(m_mainKey); }
     int     getInt(std::string intKey);
@@ -32,18 +46,22 @@ public:
     void setImage(Image* image) { setImage(image, m_mainKey); }
     void setInt(int value, std::string intKey);
     void setString(char* value, std::string stringKey);
-
-    void publishImage(Image* image, std::string publishKey);
-    void publishInt(int value, std::string publishKey);
-    void publishString(char* value, std::string publishKey);
-
-    /*
-    void publish(Image* image, std::string publishKey);
-    void publish(int value, std::string publishKey);
-    void publish(char* value, std:string publishKey);
     */
-
-    void setMainKey(std::string mainKey) { m_mainKey = mainKey; };
 };
 
-#endif // REDIS_IMAGE_HELPER
+class RedisImageHelperAsync : RedisImageHelper {
+private:
+    redisAsyncContext* m_context;
+    struct event_base* m_event;
+
+public:
+    RedisImageHelperAsync() : RedisImageHelper() {}
+    RedisImageHelperAsync(std::string host, int port, std::string mainKey) : RedisImageHelper(host, port, mainKey) {}
+
+    bool connect() override = 0;
+    ~RedisImageHelperAsync() { event_base_dispatch(m_event); redisAsyncFree(m_context);}
+
+    void subscribe(std::string subscriptionKey, void(*callback)(redisAsyncContext*, void*, void*));
+};
+
+#endif //_REDIS_IMAGE_HELPER_HPP_

@@ -29,6 +29,7 @@ file(GLOB LIBRARY_HEADERS
 #Used to have access to CMAKE_INSTALL_*DIR
 include(GNUInstallDirs)
 add_library(redisimagehelper SHARED ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
+#target_link_libraries (redisimagehelper ${HIREDIS_LIBS} event)
 set_target_properties(redisimagehelper PROPERTIES VERSION 0.1
                                                   SOVERSION 1)
 set_target_properties(redisimagehelper PROPERTIES PUBLIC_HEADER "${LIBRARY_HEADERS}")

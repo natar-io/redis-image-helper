@@ -1,10 +1,9 @@
 #include "RedisImageHelper.hpp"
 #include <iostream>
-
-bool RedisImageHelper::connect()
+bool RedisImageHelperSync::connect()
 {
     struct timeval timeout = {1, 500000};
-    m_context = redisConnectWithTimeout(m_hostname.c_str(), m_port, timeout);
+    m_context = redisConnectWithTimeout(m_host.c_str(), m_port, timeout);
     if (m_context == NULL || m_context->err)
     {
         return false;
@@ -13,6 +12,25 @@ bool RedisImageHelper::connect()
     return true;
 }
 
+bool RedisImageHelperAsync::connect()
+{
+    m_context = redisAsyncConnect(m_host.c_str(), m_port);
+    if (m_context == NULL || m_context->err)
+    {
+        return false;
+    }
+    m_event = event_base_new();
+    redisLibeventAttach(m_context, m_event);
+    return true;
+}
+
+void RedisImageHelperAsync::subscribe(std::string subscriptionKey, void (*callback)(redisAsyncContext *, void *, void *))
+{
+    std::string command = "SUBSCRIBE " + subscriptionKey;
+    redisAsyncCommand(m_context, callback, (void*) NULL, command.c_str());
+}
+
+/*
 Image* RedisImageHelper::getImage(std::string imageKey)
 {
     int width = getInt(imageKey + ":width");
@@ -96,5 +114,5 @@ void RedisImageHelper::publishInt(int value, std::string publishKey)
 void RedisImageHelper::publishString(char* value, std::string publishKey)
 {
     m_reply = (redisReply*)redisCommand(m_context, "PUBLISH %s %s", publishKey.c_str(), value);
-}
+}*/
 
