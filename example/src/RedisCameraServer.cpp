@@ -47,6 +47,15 @@ bool RedisCameraServer::start(int cameraId)
     return true;
 }
 
+void RedisCameraServer::setCameraParameters(std::string outputKey)
+{
+    cv::Mat frame;
+    *m_camera >> frame;
+    m_imageClient->setInt(frame.cols, outputKey + ":width");
+    m_imageClient->setInt(frame.rows, outputKey + ":heights");
+    m_imageClient->setInt(frame.channels(), outputKey + ":channels");
+}
+
 void RedisCameraServer::outputCameraFrame(bool publish, std::string outputKey)
 {
     cv::Mat frame, RGBFrame;

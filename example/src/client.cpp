@@ -11,6 +11,12 @@ std::string redisInputKey = "custom:image";
 std::string redisHost = "127.0.0.1";
 int redisPort = 6379;
 
+struct cameraParams {
+    uint width;
+    uint height;
+    uint channels;
+};
+
 static int parseCommandLine(cxxopts::Options options, int argc, char** argv)
 {
     auto result = options.parse(argc, argv);
@@ -71,6 +77,17 @@ static int parseCommandLine(cxxopts::Options options, int argc, char** argv)
 
 void onImagePublished(redisAsyncContext* c, void* data, void* privdata)
 {
+    struct cameraParams* cameraParams = static_cast<struct cameraParams*>(privdata);
+    if (cameraParams == NULL) {
+        if(VERBOSE) {
+            std::cerr << "Could not read camera parameters from private data." << std::endl;
+        }
+        return;
+    }
+    uint width = cameraParams->width;
+    uint height = cameraParams->height;
+    uint channels = cameraParams->channels;
+
     redisReply *reply = (redisReply*) data;
     if  (reply == NULL)
     {
@@ -79,7 +96,7 @@ void onImagePublished(redisAsyncContext* c, void* data, void* privdata)
     if (reply->type == REDIS_REPLY_ARRAY && reply->elements == 3)
     {
         cv::Mat displayFrame;
-        Image* cFrame = RedisImageHelper::dataToImage(reply->element[2]->str, 640, 480, 3, reply->element[2]->len);
+        Image* cFrame = RedisImageHelper::dataToImage(reply->element[2]->str, width, height, channels, reply->element[2]->len);
         if (cFrame == NULL) {
             if (VERBOSE) {
                 std::cerr << "Could not retrieve image from data." << std::endl;
@@ -117,9 +134,22 @@ int main(int argc, char** argv)
             std::cerr << "Could not connect to redis server." << std::endl;
             return EXIT_FAILURE;
         }
-        RedisImageHelperSync clientSync(redisHost, redisPort, redisInputKey);
 
-        clientAsync.subscribe(redisInputKey, onImagePublished);
+        RedisImageHelperSync clientSync(redisHost, redisPort, redisInputKey);
+        if (!clientSync.connect()) {
+            std::cerr << "Could not connect to redis server." << std::endl;
+            return EXIT_FAILURE;
+        }
+
+        // When the camera server is started, it automatically set camera parameters.
+        uint width = clientSync.getInt(redisInputKey + ":width");
+        uint height = clientSync.getInt(redisInputKey + ":height");
+        uint channels = clientSync.getInt(redisInputKey + ":channels");
+        struct cameraParams cameraParams;
+        cameraParams.width = width;
+        cameraParams.height = height;
+        cameraParams.channels = channels;
+        clientAsync.subscribe(redisInputKey, onImagePublished, static_cast<void*>(&cameraParams));
         return EXIT_SUCCESS;
     }
     else {

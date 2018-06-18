@@ -46,10 +46,10 @@ bool RedisImageHelperAsync::connect()
     return true;
 }
 
-void RedisImageHelperAsync::subscribe(std::string subscriptionKey, void (*callback)(redisAsyncContext *, void *, void *))
+void RedisImageHelperAsync::subscribe(std::string subscriptionKey, void (*callback)(redisAsyncContext *, void *, void *), void* privdata)
 {
     std::string command = "SUBSCRIBE " + subscriptionKey;
-    redisAsyncCommand(m_context, callback, (void*) NULL, command.c_str());
+    redisAsyncCommand(m_context, callback, privdata, command.c_str());
 }
 
 Image* RedisImageHelperSync::getImage(std::string imageKey)
@@ -95,9 +95,6 @@ void RedisImageHelperSync::setImage(Image* image, std::string imageKey)
     unsigned int channels = image->channels();
     int size = width * height * channels;
     char* data = reinterpret_cast<char*>(image->data());
-    setInt(width, imageKey + ":width");
-    setInt(height, imageKey + ":height");
-    setInt(channels, imageKey + ":channels");
     m_reply = (redisReply*)redisCommand(m_context, "SET %b %b", imageKey.c_str(), (size_t)imageKey.length(), data, size);
 }
 
@@ -120,9 +117,6 @@ void RedisImageHelperSync::publishImage(Image* image, std::string publishKey)
     int size = width * height * channels;
     char* data = reinterpret_cast<char*>(image->data());
     m_reply = (redisReply*) redisCommand(m_context, "PUBLISH %b %b", publishKey.c_str(), (size_t)publishKey.length(), data, size);
-    setInt(width, publishKey + ":width");
-    setInt(height, publishKey + ":height");
-    setInt(channels, publishKey + ":channels");
 }
 
 void RedisImageHelperSync::publishInt(int value, std::string publishKey)

@@ -66,7 +66,7 @@ public:
         //redisAsyncFree(m_context);
     }
 
-    void subscribe(std::string subscriptionKey, void(*callback)(redisAsyncContext*, void*, void*));
+    void subscribe(std::string subscriptionKey, void(*callback)(redisAsyncContext*, void*, void*), void* privdata);
 };
 
 #endif //_REDIS_IMAGE_HELPER_HPP_

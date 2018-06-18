@@ -123,6 +123,9 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
+    // Set image format into redis
+    server.setCameraParameters(redisOutputKey);
+
     if (STREAM_MODE) {
         while (true) {
             server.outputCameraFrame(true, redisOutputKey);
