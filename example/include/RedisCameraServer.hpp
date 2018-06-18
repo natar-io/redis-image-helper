@@ -7,14 +7,15 @@
 class RedisCameraServer
 {
 private:
-    RedisImageHelper* m_imageClient;
+    RedisImageHelperSync* m_imageClient;
     cv::VideoCapture* m_camera;
 public:
     RedisCameraServer();
+    RedisCameraServer(std::string host, int port, std::string mainKey);
     //~RedisCameraServer() { delete m_imageClient; delete m_camera; }
     bool start(std::string command);
-    bool start() { return start(""); }
-    void pickUpCameraFrame();
+    bool start(int cameraId = 0);
+    void outputCameraFrame(bool publish, std::string outputKey);
     void setMainKey(std::string mainKey) { m_imageClient->setMainKey(mainKey); };
 };
 

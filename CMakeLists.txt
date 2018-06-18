@@ -10,6 +10,11 @@ if (NOT HIREDIS_FOUND)
     message(FATAL_ERROR "hiredis not found.")
 endif()
 
+find_package(ev REQUIRED)
+if (NOT EV_FOUND)
+    message(FATAL_ERROR "ev not found.")
+endif()
+
 find_package(curlpp)
 if (NOT CURLPP_FOUND)
     message("Warning: cURLpp not found.")
@@ -29,7 +34,6 @@ file(GLOB LIBRARY_HEADERS
 #Used to have access to CMAKE_INSTALL_*DIR
 include(GNUInstallDirs)
 add_library(redisimagehelper SHARED ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
-#target_link_libraries (redisimagehelper ${HIREDIS_LIBS} event)
 set_target_properties(redisimagehelper PROPERTIES VERSION 0.1
                                                   SOVERSION 1)
 set_target_properties(redisimagehelper PROPERTIES PUBLIC_HEADER "${LIBRARY_HEADERS}")
@@ -42,3 +46,5 @@ install(TARGETS redisimagehelper
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/redisimagehelper)
 
 install(FILES ${CMAKE_BINARY_DIR}/redisimagehelper.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
+
+#add_subdirectory(example)

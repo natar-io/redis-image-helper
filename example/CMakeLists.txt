@@ -15,6 +15,11 @@ if (NOT HIREDIS_FOUND)
     message(FATAL_ERROR, "hiredis not found.")
 endif()
 
+find_package(ev REQUIRED)
+if (NOT EV_FOUND)
+    message(FATAL_ERROR, "ev not found.")
+endif()
+
 find_package(redisimagehelper REQUIRED)
 if (NOT REDISIMAGEHELPER_FOUND)
 	message(FATAL_ERROR, "redisimagehelper not found")
@@ -37,7 +42,7 @@ set(SERV_SOURCES
         include/RedisCameraServer.hpp)
 
 add_executable (rcamcli ${CLI_SOURCES} ${HEADERS})
-target_link_libraries (rcamcli ${REDISIMAGEHELPER_LIBS} ${HIREDIS_LIBS} ${OpenCV_LIBS})
+target_link_libraries (rcamcli ${REDISIMAGEHELPER_LIBS} ${HIREDIS_LIBS} ${OpenCV_LIBS} ev)
 
 add_executable (rcamserv ${SERV_SOURCES} ${HEADERS})
-target_link_libraries(rcamserv ${REDISIMAGEHELPER_LIBS} ${HIREDIS_LIBS} ${OpenCV_LIBS})
+target_link_libraries(rcamserv ${REDISIMAGEHELPER_LIBS} ${HIREDIS_LIBS} ${OpenCV_LIBS} ev)
