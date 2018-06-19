@@ -9,6 +9,10 @@ RedisImageHelper is built upon redis C client **hiredis**.
 - [Hiredis](https://github.com/redis/hiredis)
 - [OpenCV](https://opencv.com) **/!\ Optional** (Used to display images in sample program)
 
+Dependencies on arch:
+
+`# pacman -S hiredis`
+
 ## Compiling & Installing
 Go into project folder and run the following:
 ```
