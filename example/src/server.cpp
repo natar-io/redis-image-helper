@@ -25,7 +25,7 @@ static int parseCommandLine(cxxopts::Options options, int argc, char** argv)
     }
 
     if (result.count("o")) {
-        redisOutputKey = result["i"].as<std::string>();
+        redisOutputKey = result["o"].as<std::string>();
         if (VERBOSE) {
             std::cerr << "Output key was set to `" << redisOutputKey << "`." << std::endl;
         }

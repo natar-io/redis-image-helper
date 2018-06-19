@@ -107,6 +107,7 @@ void onImagePublished(redisAsyncContext* c, void* data, void* privdata)
         cv::cvtColor(frame, displayFrame, CV_RGB2BGR);
         cv::imshow("frame", displayFrame);
         cv::waitKey(30);
+        delete cFrame;
     }
 }
 
@@ -128,39 +129,28 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
+    RedisImageHelperSync clientSync(redisHost, redisPort, redisInputKey);
+    if (!clientSync.connect()) {
+        std::cerr << "Could not connect to redis server." << std::endl;
+        return EXIT_FAILURE;
+    }
+
     if (STREAM_MODE) {
         RedisImageHelperAsync clientAsync(redisHost, redisPort, redisInputKey);
         if (!clientAsync.connect()) {
             std::cerr << "Could not connect to redis server." << std::endl;
             return EXIT_FAILURE;
         }
-
-        RedisImageHelperSync clientSync(redisHost, redisPort, redisInputKey);
-        if (!clientSync.connect()) {
-            std::cerr << "Could not connect to redis server." << std::endl;
-            return EXIT_FAILURE;
-        }
-
-        // When the camera server is started, it automatically set camera parameters.
-        uint width = clientSync.getInt(redisInputKey + ":width");
-        uint height = clientSync.getInt(redisInputKey + ":height");
-        uint channels = clientSync.getInt(redisInputKey + ":channels");
         struct cameraParams cameraParams;
-        cameraParams.width = width;
-        cameraParams.height = height;
-        cameraParams.channels = channels;
+        cameraParams.width = clientSync.getInt(redisInputKey + ":width");
+        cameraParams.height = clientSync.getInt(redisInputKey + ":height");
+        cameraParams.channels = clientSync.getInt(redisInputKey + ":channels");
         clientAsync.subscribe(redisInputKey, onImagePublished, static_cast<void*>(&cameraParams));
         return EXIT_SUCCESS;
     }
     else {
-        RedisImageHelperSync client(redisHost, redisPort, redisInputKey);
-        if (!client.connect()) {
-            std::cerr << "Could not connect to redis server." << std::endl;
-            return EXIT_FAILURE;
-        }
-
         cv::Mat displayFrame;
-        Image* image = client.getImage();
+        Image* image = clientSync.getImage(redisInputKey);
         if (image == NULL) { std::cerr << "Error: Could not get camera frame, exiting..." << std::endl; return EXIT_FAILURE;}
         cv::Mat frame = cv::Mat(image->height(), image->width(), CV_8UC3, (void*)image->data());
         cv::cvtColor(frame, displayFrame, CV_RGB2BGR);

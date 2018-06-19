@@ -18,9 +18,9 @@ public:
             m_data[i] = data[i];
         }
 
-    };
+    }
 
-    ~Image() { delete m_data; }
+    ~Image() { delete[] m_data; }
 
     const unsigned int width() { return m_width; }
     const unsigned int height() { return m_height; }

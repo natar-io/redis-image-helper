@@ -39,8 +39,6 @@ bool RedisImageHelperAsync::connect()
     {
         return false;
     }
-    //m_event = event_base_new();
-    //redisLibeventAttach(m_context, m_event);
     redisLibevAttach(EV_DEFAULT_ m_context);
     redisAsyncSetConnectCallback(m_context, redisAsyncConnectCallback);
     return true;
@@ -90,9 +88,9 @@ char* RedisImageHelperSync::getString(std::string stringKey, size_t& dataLength)
 
 void RedisImageHelperSync::setImage(Image* image, std::string imageKey)
 {
-    unsigned int width = image->width();
-    unsigned int height = image->height();
-    unsigned int channels = image->channels();
+    unsigned int width = image->width(); setInt(width, imageKey + ":width");
+    unsigned int height = image->height(); setInt(height, imageKey + ":height");
+    unsigned int channels = image->channels(); setInt(channels, imageKey + ":channels");
     int size = width * height * channels;
     char* data = reinterpret_cast<char*>(image->data());
     m_reply = (redisReply*)redisCommand(m_context, "SET %b %b", imageKey.c_str(), (size_t)imageKey.length(), data, size);

@@ -12,7 +12,7 @@ private:
 public:
     RedisCameraServer();
     RedisCameraServer(std::string host, int port, std::string mainKey);
-    //~RedisCameraServer() { delete m_imageClient; delete m_camera; }
+    ~RedisCameraServer() { delete m_imageClient; delete m_camera; }
     bool start(std::string command);
     bool start(int cameraId = 0);
     void setCameraParameters(std::string outputKey);
