@@ -29,7 +29,6 @@ static void redisAsyncConnectCallback(const redisAsyncContext *c, int status) {
         std::cerr << "Error: " << c->errstr << std::endl;
         return;
     }
-    printf("Connected...\n");
 }
 
 bool RedisImageHelperAsync::connect()

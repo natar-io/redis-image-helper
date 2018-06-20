@@ -1,6 +1,0 @@
-# RedisImageHelper Examples
-
-
-Dependencies:
-
-`cxxopts`

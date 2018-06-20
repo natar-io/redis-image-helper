@@ -1,6 +1,10 @@
 #ifndef _IMAGE_HPP_
 #define _IMAGE_HPP_
 
+/**
+ * @brief The Image class is a data structure that represents an image.
+ * An image is represented by the following properties: width, height, channels, and data
+ */
 class Image
 {
 private:
