@@ -5,7 +5,6 @@
 Image* RedisImageHelper::dataToImage(char* data, uint width, uint height, uint channels, size_t dataLength)
 {
     if (data == NULL || dataLength != width * height * channels) {
-        std::cerr << "Data == null or size does not match" << std::endl;
         return NULL;
     }
     unsigned char* pixels = reinterpret_cast<unsigned char*>(data);
@@ -49,14 +48,16 @@ void RedisImageHelperAsync::subscribe(std::string subscriptionKey, void (*callba
     redisAsyncCommand(m_context, callback, privdata, command.c_str());
 }
 
-Image* RedisImageHelperSync::getImage(std::string imageKey)
+Image* RedisImageHelperSync::getImage(uint width, uint height, uint channels, std::string imageKey)
 {
+    /*
     int width = getInt(imageKey + ":width");
     if (width == -1) return NULL;
     int height = getInt(imageKey + ":height");
     if (height == -1) return NULL;
     int channels = getInt(imageKey + ":channels");
     if (channels == -1) return NULL;
+    */
 
     size_t dataLength;
     char* data = getString(imageKey, dataLength);

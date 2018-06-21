@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.2)
-project(redisimagehelper VERSION 0.1)
+project(redisimagehelper VERSION 0.2)
 
 set (CMAKE_CXX_STANDARD 11)
 
@@ -34,8 +34,8 @@ file(GLOB LIBRARY_HEADERS
 #Used to have access to CMAKE_INSTALL_*DIR
 include(GNUInstallDirs)
 add_library(redisimagehelper SHARED ${LIBRARY_SOURCES} ${LIBRARY_HEADERS})
-set_target_properties(redisimagehelper PROPERTIES VERSION 0.1
-                                                  SOVERSION 1)
+set_target_properties(redisimagehelper PROPERTIES VERSION 0.2
+                                                  SOVERSION 2)
 set_target_properties(redisimagehelper PROPERTIES PUBLIC_HEADER "${LIBRARY_HEADERS}")
 # This line will find the .pc.in tempalte file and replace @variable with their equivalent here
 # For example in redisimagehelper.pc.in the variable @PROJECT_NAME@ will be replaced with
@@ -46,5 +46,3 @@ install(TARGETS redisimagehelper
     PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/redisimagehelper)
 
 install(FILES ${CMAKE_BINARY_DIR}/redisimagehelper.pc DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
-
-#add_subdirectory(example)

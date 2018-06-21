@@ -84,17 +84,23 @@ public:
     /**
      * @brief getImage Gets image data from redis and tries to create an Image.
      * It uses redis BINARY GET command.
+     * @param width the width of the image to get
+     * @param height the height of the image to get
+     * @param channels the channel number of the image to get.
      * @param imageKey the key where to get data in redis.
      * @return NULL if no data were found if not the created Image.
      */
 
-    Image*  getImage(std::string imageKey);
+    Image*  getImage(uint width, uint height, uint channels, std::string imageKey);
 
     /**
      * @brief getImage Gets image data from default key in redis and tries to create an Image.
-     * @return NULL if no data were found if not the created Image.
+     * @param width the width of the image to get
+     * @param height the height of the image to get
+     * @param channels the channel number of the image to get.
+     * @return NULL if no data were found or data size does not match width * height * channels if not the created Image.
      */
-    Image*  getImage() { return getImage(m_mainKey); }
+    Image*  getImage(uint width, uint height, uint channels) { return getImage(width, height, channels, m_mainKey); }
 
     /**
      * @brief getInt Gets an int from redis.
