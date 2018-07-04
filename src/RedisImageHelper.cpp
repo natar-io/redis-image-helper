@@ -50,18 +50,14 @@ void RedisImageHelperAsync::subscribe(std::string subscriptionKey, void (*callba
 
 Image* RedisImageHelperSync::getImage(uint width, uint height, uint channels, std::string imageKey)
 {
-    /*
-    int width = getInt(imageKey + ":width");
-    if (width == -1) return NULL;
-    int height = getInt(imageKey + ":height");
-    if (height == -1) return NULL;
-    int channels = getInt(imageKey + ":channels");
-    if (channels == -1) return NULL;
-    */
-
     size_t dataLength;
     char* data = getString(imageKey, dataLength);
-    return dataToImage(data, width, height, channels, dataLength);
+    if (data == NULL) {
+        return NULL;
+    }
+    Image* image = dataToImage(data, width, height, channels, dataLength);
+    delete data;
+    return image;
 }
 
 int RedisImageHelperSync::getInt(std::string intKey)
@@ -69,9 +65,11 @@ int RedisImageHelperSync::getInt(std::string intKey)
     m_reply = (redisReply*)redisCommand(m_context, "GET %s", intKey.c_str());
     if (m_reply == NULL || m_reply->type == REDIS_REPLY_NIL || m_reply->type != REDIS_REPLY_STRING)
     {
+        freeReplyObject(m_reply);
         return -1;
     }
     int value = atoi(m_reply->str);
+    freeReplyObject(m_reply);
     return value;
 }
 
@@ -81,9 +79,13 @@ char* RedisImageHelperSync::getString(std::string stringKey, size_t& dataLength)
     dataLength = m_reply->len;
     if (m_reply == NULL || m_reply->type == REDIS_REPLY_NIL || m_reply->type != REDIS_REPLY_STRING)
     {
+        freeReplyObject(m_reply);
         return NULL;
     }
-    return m_reply->str;
+    char* string = new char[dataLength];
+    std::copy(m_reply->str, m_reply->str + dataLength * sizeof(char), string);
+    freeReplyObject(m_reply);
+    return string;
 }
 
 void RedisImageHelperSync::setImage(Image* image, std::string imageKey)
