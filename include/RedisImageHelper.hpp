@@ -79,7 +79,7 @@ public:
      * @return true if connect if not false
      */
     bool connect() override;
-    ~RedisImageHelperSync() { freeReplyObject(m_reply); redisFree(m_context); }
+    ~RedisImageHelperSync() { if (m_context != NULL) { redisFree(m_context); } }
 
     /**
      * @brief getImage Gets image data from redis and tries to create an Image.
