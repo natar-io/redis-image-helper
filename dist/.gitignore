@@ -1,0 +1,5 @@
+/natar-redis-image/
+/pkg/
+/src/
+*.tar.gz
+*.pkg.tar.xz
