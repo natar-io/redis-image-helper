@@ -4,8 +4,8 @@
 
 Image* RedisImageHelper::dataToImage(char* data, uint width, uint height, uint channels, size_t dataLength)
 {
-    if (data == NULL || dataLength != width * height * channels) {
-        return NULL;
+    if (data == nullptr || dataLength != width * height * channels) {
+        return nullptr;
     }
     unsigned char* pixels = reinterpret_cast<unsigned char*>(data);
     return new Image(width, height, channels, pixels);
@@ -15,7 +15,7 @@ bool RedisImageHelperSync::connect()
 {
     struct timeval timeout = {1, 500000};
     m_context = redisConnectWithTimeout(m_host.c_str(), m_port, timeout);
-    if (m_context == NULL || m_context->err)
+    if (m_context == nullptr || m_context->err)
     {
         return false;
     }
@@ -33,7 +33,7 @@ static void redisAsyncConnectCallback(const redisAsyncContext *c, int status) {
 bool RedisImageHelperAsync::connect()
 {
     m_context = redisAsyncConnect(m_host.c_str(), m_port);
-    if (m_context == NULL || m_context->err)
+    if (m_context == nullptr || m_context->err)
     {
         return false;
     }
@@ -52,8 +52,8 @@ Image* RedisImageHelperSync::getImage(uint width, uint height, uint channels, st
 {
     size_t dataLength;
     char* data = getString(imageKey, dataLength);
-    if (data == NULL) {
-        return NULL;
+    if (data == nullptr) {
+        return nullptr;
     }
     Image* image = dataToImage(data, width, height, channels, dataLength);
     delete data;
@@ -63,7 +63,7 @@ Image* RedisImageHelperSync::getImage(uint width, uint height, uint channels, st
 int RedisImageHelperSync::getInt(std::string intKey)
 {
     m_reply = (redisReply*)redisCommand(m_context, "GET %s", intKey.c_str());
-    if (m_reply == NULL || m_reply->type == REDIS_REPLY_NIL || m_reply->type != REDIS_REPLY_STRING)
+    if (m_reply == nullptr || m_reply->type == REDIS_REPLY_NIL || m_reply->type != REDIS_REPLY_STRING)
     {
         freeReplyObject(m_reply);
         return -1;
@@ -77,10 +77,10 @@ char* RedisImageHelperSync::getString(std::string stringKey, size_t& dataLength)
 {
     m_reply = (redisReply*)redisCommand(m_context, "GET %s", stringKey.c_str());
     dataLength = m_reply->len;
-    if (m_reply == NULL || m_reply->type == REDIS_REPLY_NIL || m_reply->type != REDIS_REPLY_STRING)
+    if (m_reply == nullptr || m_reply->type == REDIS_REPLY_NIL || m_reply->type != REDIS_REPLY_STRING)
     {
         freeReplyObject(m_reply);
-        return NULL;
+        return nullptr;
     }
     char* string = new char[dataLength];
     std::copy(m_reply->str, m_reply->str + dataLength * sizeof(char), string);
@@ -104,9 +104,9 @@ void RedisImageHelperSync::setInt(int value, std::string intKey)
     m_reply = (redisReply*)redisCommand(m_context, command.c_str());
 }
 
-void RedisImageHelperSync::setString(char* value, std::string stringKey)
+void RedisImageHelperSync::setString(std::string value, std::string stringKey)
 {
-    m_reply = (redisReply*)redisCommand(m_context, "SET %s %s", stringKey.c_str(), value);
+    m_reply = (redisReply*)redisCommand(m_context, "SET %s %s", stringKey.c_str(), value.c_str());
 }
 
 void RedisImageHelperSync::publishImage(Image* image, std::string publishKey)
@@ -124,7 +124,11 @@ void RedisImageHelperSync::publishInt(int value, std::string publishKey)
     m_reply = (redisReply*)redisCommand(m_context, "PUBLISH %s %d", publishKey.c_str(), value);
 }
 
-void RedisImageHelperSync::publishString(char* value, std::string publishKey)
+void RedisImageHelperSync::publishString(std::string value, std::string publishKey)
 {
-    m_reply = (redisReply*)redisCommand(m_context, "PUBLISH %s %s", publishKey.c_str(), value);
+    m_reply = (redisReply*)redisCommand(m_context, "PUBLISH %s %s", publishKey.c_str(), value.c_str());
+}
+
+redisReply* RedisImageHelperSync::executeCommand(std::string command) {
+    return (redisReply*) redisCommand(m_context, command.c_str());
 }

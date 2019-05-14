@@ -79,6 +79,7 @@ public:
      * @return true if connect if not false
      */
     bool connect() override;
+
     ~RedisImageHelperSync() { if (m_context != NULL) { redisFree(m_context); } }
 
     /**
@@ -168,13 +169,13 @@ public:
      * @param value the string to set into redis.
      * @param stringKey the key where to set the string.
      */
-    void setString(char* value, std::string stringKey);
+    void setString(std::string value, std::string stringKey);
 
     /**
      * @brief setString Sets a string into redis at default key.
      * @param value the string to set into redis.
      */
-    void setString(char* value) { setString(value, m_mainKey); }
+    void setString(std::string value) { setString(value, m_mainKey); }
 
     /**
      * @brief publishImage Publishes an image into redis.
@@ -212,13 +213,20 @@ public:
      * @param value the string to publish.
      * @param publishKey the key where to publish the string.
      */
-    void publishString(char* value, std::string publishKey);
+    void publishString(std::string value, std::string publishKey);
 
     /**
      * @brief publishString Publishes a string into redis at default key.
      * @param value the string to publish.
      */
-    void publishString(char* value) { publishString(value, m_mainKey); }
+    void publishString(std::string value) { publishString(value, m_mainKey); }
+
+    /**
+     * @brief executeCommand Executes a redis command using this redis client
+     * @param command the command to execute
+     * @return the command reply object (that needs to be freed later)
+     */
+    redisReply* executeCommand(std::string command);
 };
 
 /**
