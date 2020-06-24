@@ -9,6 +9,7 @@ The following needs to be installed before you can begin using **RedisImageHelpe
 - [CMake](https://cmake.org) **available as a packet** `sudo apt install cmake` or on arch `yaourt -S cmake`
 - [Hiredis](https://github.com/redis/hiredis) **available as a packet** `sudo apt install hiredis` or on arch `yaourt -S hiredis`
 - [Libev](https://github.com/enki/libev) **available as a packet** `sudo apt install libev-dev` or on arch `yaourt -S libev`
+- [libcurlpp](http://www.curlpp.org/) **available as a package** on arch `yaourt -S libcurlpp`
 
 ## Compiling & Installing
 Go into project folder and run the following:
