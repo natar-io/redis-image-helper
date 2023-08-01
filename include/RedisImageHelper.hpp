@@ -179,6 +179,7 @@ public:
 
     /**
      * @brief publishImage Publishes an image into redis.
+     * DEPRECATED
      * It uses redis BINARY PUBLISH command.
      * @param image the Image to publish.
      * @param publishKey the key where to publish the Image.
@@ -188,6 +189,7 @@ public:
 
     /**
      * @brief publishImage Publishes an Image into redis.
+     * DEPRECATED
      * @param image the Image to publish.
      * @param publishKey the key where to publish the Image.
      */

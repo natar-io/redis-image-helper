@@ -16,15 +16,20 @@ private:
 public:
     Image(unsigned int width, unsigned int height, unsigned int channels, unsigned char* data) : m_width(width), m_height(height), m_channels(channels)
     {
-        m_data = new unsigned char[width * height * channels];
-        for (int i = 0 ; i < width * height * channels; i++)
-        {
-            m_data[i] = data[i];
-        }
+        // Copy the data removed. 
+        // m_data = new unsigned char[width * height * channels];
+        // for (int i = 0 ; i < width * height * channels; i++)
+        // {
+        //     m_data[i] = data[i];
+        // }
+
+        m_data = data;
 
     }
 
-    ~Image() { delete[] m_data; }
+    // No copy anymore
+    // ~Image() { delete[] m_data; }
+    ~Image() { }
 
     const unsigned int width() { return m_width; }
     const unsigned int height() { return m_height; }

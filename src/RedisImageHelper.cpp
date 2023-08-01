@@ -109,6 +109,7 @@ void RedisImageHelperSync::setString(std::string value, std::string stringKey)
     m_reply = (redisReply*)redisCommand(m_context, "SET %s %s", stringKey.c_str(), value.c_str());
 }
 
+// Deprecated
 void RedisImageHelperSync::publishImage(Image* image, std::string publishKey)
 {
     unsigned int width = image->width();
