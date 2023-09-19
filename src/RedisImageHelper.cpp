@@ -90,12 +90,18 @@ char* RedisImageHelperSync::getString(std::string stringKey, size_t& dataLength)
 
 void RedisImageHelperSync::setImage(Image* image, std::string imageKey)
 {
-    unsigned int width = image->width(); setInt(width, imageKey + ":width");
-    unsigned int height = image->height(); setInt(height, imageKey + ":height");
-    unsigned int channels = image->channels(); setInt(channels, imageKey + ":channels");
-    int size = width * height * channels;
+  // All this set are not necessary, should be done once in a while. 
+    // unsigned int width = image->width(); setInt(width, imageKey + ":width");
+    // unsigned int height = image->height(); setInt(height, imageKey + ":height");
+    // unsigned int channels = image->channels(); setInt(channels, imageKey + ":channels");
+    int dataSize = image->dataSize();
     char* data = reinterpret_cast<char*>(image->data());
-    m_reply = (redisReply*)redisCommand(m_context, "SET %b %b", imageKey.c_str(), (size_t)imageKey.length(), data, size);
+    std::cout << "Redis Size: " << dataSize << std::endl;
+    m_reply = (redisReply*)redisCommand(m_context, "SET %b %b",
+      imageKey.c_str(), 
+      (size_t)imageKey.length(), 
+      data, 
+      dataSize);
 }
 
 void RedisImageHelperSync::setInt(int value, std::string intKey)
